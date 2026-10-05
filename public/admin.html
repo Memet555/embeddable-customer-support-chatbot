@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Bot Admin Paneli</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0b0f14; color: #e6edf3; line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .header { background: #11161d; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #1f2937; }
+    .header h1 { color: #2dd4bf; margin-bottom: 10px; }
+    .login-form { max-width: 400px; margin: 50px auto; background: #11161d; padding: 30px; border-radius: 12px; border: 1px solid #1f2937; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: #9aa4b2; }
+    .form-group input { width: 100%; padding: 12px; border: 1px solid #243041; border-radius: 8px; background: #0b1220; color: #e6edf3; }
+    .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+    .btn-primary { background: #2dd4bf; color: #0b0f14; }
+    .btn-primary:hover { background: #20b5a0; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+    .hidden { display: none; }
+    .table { width: 100%; border-collapse: collapse; background: #11161d; border-radius: 8px; overflow: hidden; border: 1px solid #1f2937; }
+    .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #1f2937; }
+    .table th { background: #0f1720; color: #2dd4bf; font-weight: 600; }
+    .table tr:hover { background: #0b1220; }
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: #11161d; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; border: 1px solid #1f2937; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-header h3 { color: #2dd4bf; }
+    .close { background: none; border: none; color: #9aa4b2; font-size: 24px; cursor: pointer; }
+    .form-row { display: flex; gap: 15px; margin-bottom: 20px; }
+    .form-row .form-group { flex: 1; }
+    .actions { display: flex; gap: 10px; margin-top: 20px; }
+    .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+    .alert-success { background: #065f46; color: #a7f3d0; border: 1px solid #10b981; }
+    .alert-error { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card { background: #11161d; padding: 20px; border-radius: 12px; border: 1px solid #1f2937; text-align: center; }
+    .stat-number { font-size: 2em; font-weight: bold; color: #2dd4bf; }
+    .stat-label { color: #9aa4b2; margin-top: 5px; }
+    .tab-navigation { display: flex; gap: 10px; border-bottom: 1px solid #1f2937; }
+    .tab-btn { padding: 12px 24px; border: none; background: transparent; color: #9aa4b2; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-btn.active { color: #2dd4bf; border-bottom-color: #2dd4bf; }
+    .tab-btn:hover { color: #e6edf3; }
+    .tab-content { display: block; }
+    .tab-content.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Giriş Formu -->
+    <div id="loginForm" class="login-form">
+      <h2>Admin Girişi</h2>
+      <form id="loginFormElement">
+        <div class="form-group">
+          <label for="username">Kullanıcı Adı:</label>
+          <input type="text" id="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Şifre:</label>
+          <input type="password" id="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Giriş Yap</button>
+      </form>
+      <div id="loginError" class="alert alert-error hidden"></div>
+    </div>
+
+    <!-- Admin Paneli -->
+    <div id="adminPanel" class="hidden">
+      <div class="header">
+        <h1>🤖 Chat Bot Admin Paneli</h1>
+        <p>Bot yanıtlarını yönetin ve istatistikleri görüntüleyin</p>
+        <button onclick="logout()" class="btn btn-secondary">Çıkış Yap</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="totalResponses">0</div>
+          <div class="stat-label">Toplam Yanıt</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="categoryCount">0</div>
+          <div class="stat-label">Kategori Sayısı</div>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-navigation" style="margin-bottom: 20px;">
+        <button class="tab-btn active" onclick="switchTab('responses')">Bot Yanıtları</button>
+        <button class="tab-btn" onclick="switchTab('products')">Ürün Yönetimi</button>
+      </div>
+
+      <!-- Bot Responses Tab -->
+      <div id="responsesTab" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Bot Yanıtları</h2>
+          <button onclick="openModal()" class="btn btn-primary">+ Yeni Yanıt Ekle</button>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Kategori</th>
+              <th>Anahtar Kelimeler</th>
+              <th>Yanıt</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody id="responsesTable">
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Products Tab -->
+      <div id="productsTab" class="tab-content" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Ürün Yönetimi</h2>
+          <button onclick="openProductModal()" class="btn btn-primary">+ Yeni Ürün Ekle</button>
+        </div>
+
+        <div id="productAlertContainer"></div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ürün Adı</th>
+              <th>Kategori</th>
+              <th>Renk</th>
+              <th>Beden</th>
+              <th>Stok</th>
+              <th>Fiyat</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="responseModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">Yeni Yanıt Ekle</h3>
+        <button class="close" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="responseForm">
+        <input type="hidden" id="responseId">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Kategori:</label>
+            <select id="category" required>
+              <option value="greeting">Selamlaşma</option>
+              <option value="kargo">Kargo</option>
+              <option value="iade">İade/Değişim</option>
+              <option value="beden">Beden</option>
+              <option value="general">Genel</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="keywords">Anahtar Kelimeler (virgülle ayırın):</label>
+          <input type="text" id="keywords" placeholder="merhaba,selam,hello" required>
+        </div>
+        <div class="form-group">
+          <label for="response">Yanıt:</label>
+          <textarea id="response" rows="3" required style="width: 100%; padding: 12px; border: 1px solid #243041; border-radius: 8px; background: #0b1220; color: #e6edf3; resize: vertical;"></textarea>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn btn-success">Kaydet</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">İptal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product Modal -->
+  <div id="productModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="productModalTitle">Yeni Ürün Ekle</h3>
+        <button class="close" onclick="closeProductModal()">&times;</button>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="productId">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="productName">Ürün Adı:</label>
+            <input type="text" id="productName" required>
+          </div>
+          <div class="form-group">
+            <label for="productCategory">Kategori:</label>
+            <select id="productCategory" required>
+              <option value="Tişört">Tişört</option>
+              <option value="Pantolon">Pantolon</option>
+              <option value="Elbise">Elbise</option>
+              <option value="Gömlek">Gömlek</option>
+              <option value="Kazak">Kazak</option>
+              <option value="Etek">Etek</option>
+              <option value="Ceket">Ceket</option>
+              <option value="Mont">Mont</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="productColor">Renk:</label>
+            <input type="text" id="productColor" placeholder="Kırmızı, Mavi, vb." required>
+          </div>
+          <div class="form-group">
+            <label for="productSize">Beden:</label>
+            <select id="productSize" required>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="XXXL">XXXL</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="productStock">Stok:</label>
+            <input type="number" id="productStock" min="0" required>
+          </div>
+          <div class="form-group">
+            <label for="productPrice">Fiyat (₺):</label>
+            <input type="number" id="productPrice" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="productDescription">Açıklama:</label>
+          <textarea id="productDescription" rows="3" style="width: 100%; padding: 12px; border: 1px solid #243041; border-radius: 8px; background: #0b1220; color: #e6edf3; resize: vertical;"></textarea>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn btn-success">Kaydet</button>
+          <button type="button" class="btn btn-secondary" onclick="closeProductModal()">İptal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const BASE_PATH = window.BASE_PATH || "/";
+    let responses = [];
+    let products = [];
+    let isLoggedIn = false;
+    let currentTab = 'responses';
+
+    // Giriş formu
+    document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch(`${BASE_PATH}api/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          isLoggedIn = true;
+          document.getElementById('loginForm').classList.add('hidden');
+          document.getElementById('adminPanel').classList.remove('hidden');
+          loadResponses();
+          loadProducts();
+        } else {
+          showAlert(data.message, 'error');
+        }
+      } catch (error) {
+        showAlert('Giriş sırasında hata oluştu', 'error');
+      }
+    });
+
+    // Yanıtları yükle
+    async function loadResponses() {
+      try {
+        const response = await fetch(`${BASE_PATH}api/admin/responses`);
+        responses = await response.json();
+        renderTable();
+        updateStats();
+      } catch (error) {
+        showAlert('Yanıtlar yüklenirken hata oluştu', 'error');
+      }
+    }
+
+    // Tabloyu render et
+    function renderTable() {
+      const tbody = document.getElementById('responsesTable');
+      tbody.innerHTML = responses.map(response => `
+        <tr>
+          <td>${response.id}</td>
+          <td>${response.category}</td>
+          <td>${response.keywords}</td>
+          <td>${response.response.substring(0, 50)}${response.response.length > 50 ? '...' : ''}</td>
+          <td>
+            <button onclick="editResponse(${response.id})" class="btn btn-secondary" style="padding: 6px 12px; margin-right: 5px;">Düzenle</button>
+            <button onclick="deleteResponse(${response.id})" class="btn btn-danger" style="padding: 6px 12px;">Sil</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // İstatistikleri güncelle
+    function updateStats() {
+      document.getElementById('totalResponses').textContent = responses.length;
+      const categories = [...new Set(responses.map(r => r.category))];
+      document.getElementById('categoryCount').textContent = categories.length;
+    }
+
+    // Modal aç
+    function openModal(response = null) {
+      const modal = document.getElementById('responseModal');
+      const form = document.getElementById('responseForm');
+      
+      if (response) {
+        document.getElementById('modalTitle').textContent = 'Yanıtı Düzenle';
+        document.getElementById('responseId').value = response.id;
+        document.getElementById('category').value = response.category;
+        document.getElementById('keywords').value = response.keywords;
+        document.getElementById('response').value = response.response;
+      } else {
+        document.getElementById('modalTitle').textContent = 'Yeni Yanıt Ekle';
+        form.reset();
+      }
+      
+      modal.classList.remove('hidden');
+    }
+
+    // Modal kapat
+    function closeModal() {
+      document.getElementById('responseModal').classList.add('hidden');
+    }
+
+    // Yanıt düzenle
+    function editResponse(id) {
+      const response = responses.find(r => r.id === id);
+      if (response) openModal(response);
+    }
+
+    // Yanıt sil
+    async function deleteResponse(id) {
+      if (!confirm('Bu yanıtı silmek istediğinizden emin misiniz?')) return;
+
+      try {
+        const response = await fetch(`${BASE_PATH}api/admin/responses/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          showAlert('Yanıt başarıyla silindi', 'success');
+          loadResponses();
+        } else {
+          showAlert('Silme işlemi başarısız', 'error');
+        }
+      } catch (error) {
+        showAlert('Silme sırasında hata oluştu', 'error');
+      }
+    }
+
+    // Form gönderimi
+    document.getElementById('responseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('responseId').value;
+      const category = document.getElementById('category').value;
+      const keywords = document.getElementById('keywords').value;
+      const response = document.getElementById('response').value;
+
+      try {
+        const url = id ? `${BASE_PATH}api/admin/responses/${id}` : `${BASE_PATH}api/admin/responses`;
+        const method = id ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category, keywords, response })
+        });
+
+        if (response.ok) {
+          showAlert(id ? 'Yanıt güncellendi' : 'Yanıt eklendi', 'success');
+          closeModal();
+          loadResponses();
+        } else {
+          showAlert('İşlem başarısız', 'error');
+        }
+      } catch (error) {
+        showAlert('İşlem sırasında hata oluştu', 'error');
+      }
+    });
+
+    // Uyarı göster
+    function showAlert(message, type) {
+      const container = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      container.appendChild(alert);
+      
+      setTimeout(() => {
+        alert.remove();
+      }, 5000);
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      currentTab = tabName;
+      
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Show/hide tab content
+      document.getElementById('responsesTab').style.display = tabName === 'responses' ? 'block' : 'none';
+      document.getElementById('productsTab').style.display = tabName === 'products' ? 'block' : 'none';
+    }
+
+    // Product management functions
+    async function loadProducts() {
+      try {
+        const response = await fetch(`${BASE_PATH}api/admin/products`);
+        products = await response.json();
+        renderProductsTable();
+      } catch (error) {
+        showProductAlert('Ürünler yüklenirken hata oluştu', 'error');
+      }
+    }
+
+    function renderProductsTable() {
+      const tbody = document.getElementById('productsTable');
+      tbody.innerHTML = products.map(product => `
+        <tr>
+          <td>${product.id}</td>
+          <td>${product.name}</td>
+          <td>${product.category}</td>
+          <td>${product.color}</td>
+          <td>${product.size}</td>
+          <td style="color: ${product.stock > 0 ? '#10b981' : '#ef4444'}">${product.stock}</td>
+          <td>${product.price}₺</td>
+          <td>
+            <button onclick="editProduct(${product.id})" class="btn btn-secondary" style="padding: 6px 12px; margin-right: 5px;">Düzenle</button>
+            <button onclick="deleteProduct(${product.id})" class="btn btn-danger" style="padding: 6px 12px;">Sil</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openProductModal(product = null) {
+      const modal = document.getElementById('productModal');
+      const form = document.getElementById('productForm');
+      
+      if (product) {
+        document.getElementById('productModalTitle').textContent = 'Ürünü Düzenle';
+        document.getElementById('productId').value = product.id;
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productCategory').value = product.category;
+        document.getElementById('productColor').value = product.color;
+        document.getElementById('productSize').value = product.size;
+        document.getElementById('productStock').value = product.stock;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productDescription').value = product.description || '';
+      } else {
+        document.getElementById('productModalTitle').textContent = 'Yeni Ürün Ekle';
+        form.reset();
+      }
+      
+      modal.classList.remove('hidden');
+    }
+
+    function closeProductModal() {
+      document.getElementById('productModal').classList.add('hidden');
+    }
+
+    function editProduct(id) {
+      const product = products.find(p => p.id === id);
+      if (product) openProductModal(product);
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('Bu ürünü silmek istediğinizden emin misiniz?')) return;
+
+      try {
+        const response = await fetch(`${BASE_PATH}api/admin/products/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          showProductAlert('Ürün başarıyla silindi', 'success');
+          loadProducts();
+        } else {
+          showProductAlert('Silme işlemi başarısız', 'error');
+        }
+      } catch (error) {
+        showProductAlert('Silme sırasında hata oluştu', 'error');
+      }
+    }
+
+    function showProductAlert(message, type) {
+      const container = document.getElementById('productAlertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      container.appendChild(alert);
+      
+      setTimeout(() => {
+        alert.remove();
+      }, 5000);
+    }
+
+    // Product form submission
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('productId').value;
+      const name = document.getElementById('productName').value;
+      const category = document.getElementById('productCategory').value;
+      const color = document.getElementById('productColor').value;
+      const size = document.getElementById('productSize').value;
+      const stock = parseInt(document.getElementById('productStock').value);
+      const price = parseFloat(document.getElementById('productPrice').value);
+      const description = document.getElementById('productDescription').value;
+
+      try {
+        const url = id ? `${BASE_PATH}api/admin/products/${id}` : `${BASE_PATH}api/admin/products`;
+        const method = id ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, category, color, size, stock, price, description })
+        });
+
+        if (response.ok) {
+          showProductAlert(id ? 'Ürün güncellendi' : 'Ürün eklendi', 'success');
+          closeProductModal();
+          loadProducts();
+        } else {
+          showProductAlert('İşlem başarısız', 'error');
+        }
+      } catch (error) {
+        showProductAlert('İşlem sırasında hata oluştu', 'error');
+      }
+    });
+
+    // Çıkış yap
+    function logout() {
+      isLoggedIn = false;
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('adminPanel').classList.add('hidden');
+      document.getElementById('loginFormElement').reset();
+    }
+  </script>
+</body>
+</html>

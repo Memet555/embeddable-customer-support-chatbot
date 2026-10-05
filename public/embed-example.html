@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Embed Örneği</title>
+  <style>
+    /* Örnek site CSS'i - chatbot bu stilleri inherit edecek */
+    :root {
+      --primary-color: #3b82f6;
+      --primary-hover: #2563eb;
+      --background: #f8fafc;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --card-bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      border: 1px solid var(--border);
+    }
+
+    .header h1 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 30px;
+    }
+
+    .main-content {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 1px solid var(--border);
+    }
+
+    .sidebar {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 1px solid var(--border);
+      height: fit-content;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .product-card h3 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    .product-card .price {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: var(--text);
+      margin: 10px 0;
+    }
+
+    .btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .chatbot-info {
+      background: #f1f5f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .chatbot-info h3 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    .chatbot-info p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Chatbot inherit edecek CSS değişkenleri */
+    :root {
+      --chatbot-primary: var(--primary-color);
+      --chatbot-primary-text: white;
+      --chatbot-primary-hover: var(--primary-hover);
+      --chatbot-bg: var(--card-bg);
+      --chatbot-text: var(--text);
+      --chatbot-muted: var(--muted);
+      --chatbot-border: var(--border);
+      --chatbot-header-bg: #f8fafc;
+      --chatbot-message-bg: #f1f5f9;
+      --chatbot-input-bg: white;
+      --chatbot-input-border: var(--border);
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🛍️ E-Ticaret Mağazası</h1>
+      <p>Modern ve şık ürünlerle dolu mağazamıza hoş geldiniz!</p>
+    </div>
+
+    <div class="content">
+      <div class="main-content">
+        <h2>Yeni Ürünler</h2>
+        <p>En yeni koleksiyonumuzdan seçkin ürünleri keşfedin. Kaliteli malzemeler ve modern tasarımlarla hazırlanmış ürünlerimiz.</p>
+        
+        <div class="product-grid">
+          <div class="product-card">
+            <h3>Kırmızı Tişört</h3>
+            <p>Rahat kesim pamuklu tişört</p>
+            <div class="price">89.99₺</div>
+            <button class="btn">Sepete Ekle</button>
+          </div>
+          
+          <div class="product-card">
+            <h3>Mavi Jean</h3>
+            <p>Klasik mavi jean pantolon</p>
+            <div class="price">199.99₺</div>
+            <button class="btn">Sepete Ekle</button>
+          </div>
+          
+          <div class="product-card">
+            <h3>Siyah Elbise</h3>
+            <p>Şık siyah elbise</p>
+            <div class="price">299.99₺</div>
+            <button class="btn">Sepete Ekle</button>
+          </div>
+          
+          <div class="product-card">
+            <h3>Beyaz Gömlek</h3>
+            <p>Klasik beyaz gömlek</p>
+            <div class="price">149.99₺</div>
+            <button class="btn">Sepete Ekle</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="chatbot-info">
+          <h3>💬 Müşteri Destek</h3>
+          <p>Herhangi bir sorunuz var mı? Canlı destek ekibimizle konuşun!</p>
+        </div>
+        
+        <h3>Hızlı Linkler</h3>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin: 10px 0;"><a href="#" style="color: var(--primary-color); text-decoration: none;">Kargo Takibi</a></li>
+          <li style="margin: 10px 0;"><a href="#" style="color: var(--primary-color); text-decoration: none;">İade & Değişim</a></li>
+          <li style="margin: 10px 0;"><a href="#" style="color: var(--primary-color); text-decoration: none;">Beden Tablosu</a></li>
+          <li style="margin: 10px 0;"><a href="#" style="color: var(--primary-color); text-decoration: none;">İletişim</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chatbot Embed -->
+  <script src="./config.js"></script>
+  <script src="./chatbot.js"></script>
+  
+  <script>
+    // Chatbot'u özelleştirme örneği
+    document.addEventListener('DOMContentLoaded', function() {
+      // Chatbot widget'ı yüklendikten sonra özelleştirme
+      if (window.ChatbotWidget) {
+        console.log('Chatbot widget yüklendi!');
+        
+        // Örnek: Chatbot'a özel mesaj ekleme
+        // window.ChatbotWidget.addMessage('Hoş geldiniz! Size nasıl yardımcı olabilirim?', 'bot');
+      }
+    });
+  </script>
+</body>
+</html>

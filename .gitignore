@@ -1,0 +1,7 @@
+﻿node_modules/
+chatbot.db
+*.log
+.env
+.DS_Store
+.vscode/
+.idea/

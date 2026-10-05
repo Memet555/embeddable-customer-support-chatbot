@@ -1,0 +1,35 @@
+:root{ 
+  --bg:#0b0f14; 
+  --panel:#11161d; 
+  --accent:#2dd4bf; 
+  --muted:#9aa4b2; 
+  --text:#e6edf3;
+  --chatbot-primary: #2dd4bf;
+  --chatbot-primary-text: #0b0f14;
+  --chatbot-primary-hover: #20b5a0;
+  --chatbot-bg: #11161d;
+  --chatbot-text: #e6edf3;
+  --chatbot-muted: #9aa4b2;
+  --chatbot-border: #1f2937;
+  --chatbot-header-bg: #0f1720;
+  --chatbot-message-bg: #0b1220;
+  --chatbot-input-bg: #0b1220;
+  --chatbot-input-border: #243041;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; font:16px/1.4 system-ui; background:linear-gradient(180deg,#0b0f14,#0f1720 40%,#0b0f14); color:var(--text); display:grid; place-items:center; height:100vh; }
+.chat{ width:min(680px,92vw); height:min(78vh,780px); background:var(--panel); border:1px solid #1f2937; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35); display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; }
+.chat__header{ padding:14px 16px; display:flex; align-items:center; justify-content:space-between; background:#0f1720; border-bottom:1px solid #1f2937; }
+.chat__title{ font-weight:700; letter-spacing:.2px; }
+.chat__status{ font-size:12px; color:var(--muted); }
+.chat__log{ padding:16px; overflow:auto; display:flex; flex-direction:column; gap:10px; }
+.msg{ max-width:78%; padding:10px 12px; border-radius:12px; white-space:pre-wrap; word-wrap:break-word; line-height:1.35; }
+.msg--bot{ align-self:flex-start; background:#0b1220; border:1px solid #1f2937; }
+.msg--me{ align-self:flex-end; background:var(--accent); color:#0b0f14; font-weight:600; }
+.time{ display:block; margin-top:6px; font-size:11px; color:#93a0ad; }
+.chat__form{ display:flex; gap:8px; padding:12px; border-top:1px solid #1f2937; background:#0f1720; }
+.chat__input{ flex:1; padding:12px 14px; border-radius:10px; border:1px solid #243041; background:#0b1220; color:#var(--text); outline:none; }
+.chat__input::placeholder{ color:#6b7785; }
+.chat__send{ padding:10px 14px; border-radius:10px; border:1px solid #2a394e; background:var(--accent); color:#08222a; font-weight:700; cursor:pointer; }
+.typing{ font-size:12px; color:#95a1ae; animation:blink 1.2s infinite; }
+@keyframes blink{ 0%,100%{opacity:.3} 50%{opacity:1} }

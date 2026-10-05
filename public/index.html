@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Butik Destek Sohbet</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="chat">
+    <header class="chat__header">
+      <div class="chat__title">Butik Destek</div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="chat__status" id="status">çevrim içi</div>
+        <a href="./admin" style="color: #2dd4bf; text-decoration: none; font-size: 12px; padding: 4px 8px; border: 1px solid #2dd4bf; border-radius: 4px;">Admin</a>
+      </div>
+    </header>
+    <main class="chat__log" id="log" aria-live="polite"></main>
+    <form id="form" class="chat__form" autocomplete="off">
+      <input id="input" class="chat__input" placeholder="Mesajınızı yazın…" />
+      <button class="chat__send" type="submit">Gönder</button>
+    </form>
+  </div>
+  <script src="./config.js"></script>
+  <script src="./app.js" type="module"></script>
+</body>
+</html>
